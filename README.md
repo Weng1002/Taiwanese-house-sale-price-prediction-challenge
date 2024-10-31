@@ -140,8 +140,9 @@ for i, feature in enumerate(features):
 
 plt.show()
 ```
-> 圖中的中文字編碼有誤，順序由左至右由上至下分別是('土地移轉總面積平方公尺', '交易筆棟數', '總樓層數', '建物現況格局-房', '建物現況格局-廳', 
-    '建物現況格局-衛', '單價元平方公尺', '車位移轉總面積平方公尺', '車位總價元')
+> 圖中的中文字編碼有誤，順序由左至右由上至下分別是  
+('土地移轉總面積平方公尺', '交易筆棟數', '總樓層數', '建物現況格局-房', '建物現況格局-廳',  
+'建物現況格局-衛', '單價元平方公尺', '車位移轉總面積平方公尺', '車位總價元')
 ![Correlations Diagram](Image/Correlations.png)
 
 
@@ -161,3 +162,15 @@ print(df_train.dtypes)
 ```
 ![Data Type](Image/資料型態.png)
 
+#### 6. 刪除離群值
+```python
+df_train = df_train[df_train['土地移轉總面積平方公尺'] < 8000]
+df_train = df_train[df_train['建物移轉總面積平方公尺'] < 15000] #
+df_train = df_train[df_train['車位移轉總面積平方公尺'] < 4000]
+df_train = df_train[df_train['車位總價元'] < 14000000]
+
+# 檢查結果
+print("訓練集 rows:", len(df_train))
+print("驗證集 rows:", len(df_valid))
+```
+![Data Count](Image/資料集數量.png)
