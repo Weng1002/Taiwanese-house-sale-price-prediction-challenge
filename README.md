@@ -73,6 +73,86 @@ warnings.filterwarnings("ignore")
 df_train = pd.read_excel('Data/train.xlsx')
 df_valid = pd.read_excel('Data/valid.xlsx')
 df_test = pd.read_excel('Data/test-reindex-test.xlsx')
+```
 
+#### 2. 重新調整train、valid資料集比例(80/20)
+```python
+df_all = pd.concat([df_train, df_valid], axis=0)
+df_all = df_all.sample(frac=1, random_state=42).reset_index(drop=True)
 
+df_valid_ratio = 0.2
+df_valid_size = int(len(df_all) * df_valid_ratio)
+
+df_train = df_all[:-df_valid_size]
+df_valid = df_all[-df_valid_size:]
+```
+
+#### 3. 先找出所有特徵跟總價元之間的關聯性
+```python
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+
+rcParams['font.family'] = 'Microsoft YaHei'  
+rcParams['axes.unicode_minus'] = False  
+
+def remove_outliers_zscore(df, column, threshold=3):
+    mean = df[column].mean()
+    std = df[column].std()
+    df_clean = df[(np.abs((df[column] - mean) / std) <= threshold)]
+    return df_clean
+
+def scatterplot(feature, df):
+    df_copy = df.copy()
+    pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x))
+    sns.set_style('darkgrid')
+
+    df_copy[feature] = pd.to_numeric(df_copy[feature], errors='coerce')
+    df_copy.dropna(subset=[feature, '總價元'], inplace=True)
+
+    plt.figure(figsize=(8, 5))
+    sns.scatterplot(x=df_copy[feature], y=df_copy['總價元'], alpha=0.5)
+
+    plt.title(f'{feature} 與 總價元 的散佈圖', fontsize=12)
+    plt.xlabel(feature)
+    plt.ylabel('總價元')
+
+    plt.show()
+
+    return df_copy
+
+features = [
+    '鄉鎮市區', '交易標的', '土地位置建物門牌', '土地移轉總面積平方公尺', '都市土地使用分區', '非都市土地使用分區', 
+    '非都市土地使用編定', '交易年月日', '交易筆棟數', '移轉層次', '總樓層數', '建物型態', '主要用途', 
+    '主要建材', '建築完成年月', '建物移轉總面積平方公尺', '建物現況格局-房', '建物現況格局-廳', 
+    '建物現況格局-衛', '建物現況格局-隔間', '有無管理組織', '單價元平方公尺', '車位類別', 
+    '車位移轉總面積平方公尺', '車位總價元', '備註', '建案名稱', '棟及號', '解約情形'
+]
+
+# 依序繪製每個特徵的散佈圖
+for feature in features:
+    try:
+        print(f"繪製 {feature} 與 總價元 的散佈圖")
+        scatterplot(feature, df_train)
+    except Exception as e:
+        print(f"{feature} 特徵無法繪製散佈圖，錯誤原因：{e}")
+```
+
+#### 4. 刪除掉raw data中有"main use"的row(rawdata中有一行亂碼)
+`df_train = df_train[~df_train['主要用途'].str.contains("main use", na=False)]`
+
+#### 5. 刪除不重要的特徵
+```python
+df_train = df_train.drop(['編號', '解約情形', '棟及號', '交易標的','移轉層次','總樓層數', '非都市土地使用編定' , '有無管理組織' ,'備註', '建案名稱', '建築完成年月', '交易年月日'], axis=1)
+df_valid = df_valid.drop(['編號', '解約情形', '棟及號', '交易標的','移轉層次','總樓層數', '非都市土地使用編定' , '有無管理組織' ,'備註', '建案名稱', '建築完成年月', '交易年月日'], axis=1)
+df_test = df_test.drop(['編號', '解約情形', '棟及號', '交易標的','移轉層次','總樓層數', '非都市土地使用編定' , '有無管理組織' ,'備註', '建案名稱', '建築完成年月', '交易年月日'], axis=1)
+df_train = df_train.drop(['鄉鎮市區'], axis=1)
+df_valid = df_valid.drop(['鄉鎮市區'], axis=1)
+df_test = df_test.drop(['鄉鎮市區'], axis=1)
+print(df_train.columns.tolist())
+print(df_train.dtypes)
+```
+![Data Type](Image/資料型態.png)
 
