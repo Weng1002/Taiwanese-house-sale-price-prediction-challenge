@@ -640,3 +640,124 @@ print(df_test.iloc[0])
 ```
 ![最終成績](Image/最終資料型態.png)
 
+### 第三步：建模型/訓練模型
+#### 1. 建模型，利用XGBoost
+```python
+import xgboost as xgb
+
+
+X_train = df_train.drop(columns=['總價元'])  # 特徵欄位
+y_train = df_train['總價元']                # 目標變數
+
+X_valid = df_valid.drop(columns=['總價元'])  # 驗證特徵
+y_valid = df_valid['總價元']                # 驗證目標變數
+
+
+dtrain = xgb.DMatrix(X_train, label=y_train)
+dvalid = xgb.DMatrix(X_valid, label=y_valid)
+dtest = xgb.DMatrix(df_test)
+
+params = {
+    'objective': 'reg:absoluteerror',  # 使用 MAE 進行回歸
+    'learning_rate': 0.1,
+    'max_depth': 10,
+    'eval_metric': 'mae',  
+    'lambda': 1,   # L2 正則化
+    'alpha': 1     # L1 正則化
+}
+
+evallist = [(dtrain, 'train'), (dvalid, 'eval')]
+model = xgb.train(params, dtrain, num_boost_round=2000, evals=evallist)
+predictions = model.predict(dtest)
+
+result_df = pd.DataFrame({
+    '編號': df_test.index + 1,  
+    '總價元': predictions
+})
+
+result_df.to_csv('house_price_predictions.csv', index=False, encoding='utf-8-sig')
+print("訓練完成")
+```
+
+#### 2. 建模型，利用LightGBM
+```python
+import lightgbm as lgb
+
+df_train['總價元'] = pd.to_numeric(df_train['總價元'], errors='coerce')
+df_valid['總價元'] = pd.to_numeric(df_valid['總價元'], errors='coerce')
+
+# Step 1: 準備訓練資料和驗證資料
+X_train = df_train.drop(columns=['總價元'])  # 特徵欄位
+y_train = df_train['總價元']                # 目標變數
+
+X_valid = df_valid.drop(columns=['總價元'])  # 驗證特徵
+y_valid = df_valid['總價元']                # 驗證目標變數
+
+# Step 2: 建立 LightGBM 模型並訓練
+model_lgb = lgb.LGBMRegressor(objective='regression_l1',  # 使用 MAE
+                              n_estimators=2000, learning_rate=0.1, max_depth=6)
+
+model_lgb.fit(X_train, y_train, 
+              eval_set=[(X_valid, y_valid)], 
+              eval_metric='mae') 
+
+# Step 3: 預測測試集的結果
+predictions_lgb = model_lgb.predict(df_test)
+
+# Step 4: 將預測結果寫入 CSV 檔案
+result_df_lgb = pd.DataFrame({
+    '編號': df_test.index + 1,  # 假設編號是從 1 開始
+    '總價元': predictions_lgb
+})
+print("訓練完成")
+```
+
+#### 3. 建模型，利用Catboost
+```python
+from catboost import CatBoostRegressor
+
+# Step 1: 準備訓練資料和驗證資料
+X_train = df_train.drop(columns=['總價元'])  # 特徵欄位
+y_train = df_train['總價元']                # 目標變數
+
+X_valid = df_valid.drop(columns=['總價元'])  # 驗證特徵
+y_valid = df_valid['總價元']                # 驗證目標變數
+
+# Step 2: 建立 CatBoost 模型並訓練
+model_cat = CatBoostRegressor(iterations=2000, depth=6, learning_rate=0.1, loss_function='MAE', verbose=10)
+
+model_cat.fit(X_train, y_train, 
+              eval_set=[(X_valid, y_valid)], 
+              early_stopping_rounds=10)
+
+# 預測測試集的結果
+predictions_cat = model_cat.predict(df_test)
+
+# 將預測結果寫入 CSV 檔案
+result_df_cat = pd.DataFrame({
+    '編號': df_test.index + 1,
+    '總價元': predictions_cat
+})
+print("訓練完成")
+
+```
+
+#### 4. 利用集成學習，將三個模型的結果取比例平均
+```python
+xgb_weight = 0.8
+lgb_weight = 0.1
+cat_weight = 0.1
+
+final_predictions = (xgb_weight * predictions +
+                     lgb_weight * predictions_lgb +
+                     cat_weight * predictions_cat)
+
+
+result_df_combined = pd.DataFrame({
+    '編號': df_test.index + 1,
+    '總價元': final_predictions
+})
+result_df_combined.to_csv('house_price_predictions.csv', index=False, encoding='utf-8-sig')
+
+print("加權平均完成，結果已保存至 CSV。")
+```
