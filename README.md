@@ -3,8 +3,6 @@
 
 本次是機器學習第一次作業，是拿台灣真實房價的資料來去訓練一個模型，然後透過公開的房屋成交價來去預測準確的對應價格。  
 
-參考資料：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 內政部不動產成交案件實際資訊資料供應系統。  
-
 Kaggle Competition：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 競賽連結
 
 最終成績如下所示：
