@@ -2,8 +2,12 @@
 ## Author：國立陽明交通大學 資訊管理與財務金融學系財務金融所碩一 313707043 翁智宏
 
 本次是機器學習第一次作業，是拿台灣真實房價的資料來去訓練一個模型，然後透過公開的房屋成交價來去預測準確的對應價格。  
-參考資料：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 內政部不動產成交案件實際資訊資料供應系統。
 
+參考資料：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 內政部不動產成交案件實際資訊資料供應系統。  
+
+Kaggle Competition：[點擊這裡](https://plvr.land.moi.gov.tw/Index)　　
+
+成績：![最終成績](image/image.png) 誤差在10萬上下
 ---
 
 ## 任務說明
