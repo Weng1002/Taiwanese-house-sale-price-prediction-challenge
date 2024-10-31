@@ -5,9 +5,13 @@
 
 參考資料：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 內政部不動產成交案件實際資訊資料供應系統。  
 
-Kaggle Competition：[點擊這裡](https://plvr.land.moi.gov.tw/Index)　　
+Kaggle Competition：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 競賽連結
 
-成績：![最終成績](image/image.png) 誤差在10萬上下
+最終成績如下所示：
+
+![最終成績](image/image.png)
+
+> 誤差在 10 萬上下
 ---
 
 ## 任務說明
