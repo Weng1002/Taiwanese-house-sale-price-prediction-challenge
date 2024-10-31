@@ -759,5 +759,5 @@ result_df_combined = pd.DataFrame({
 })
 result_df_combined.to_csv('house_price_predictions.csv', index=False, encoding='utf-8-sig')
 
-print("加權平均完成，結果已保存至 CSV。")
+print("加權平均完成")
 ```
