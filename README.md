@@ -104,7 +104,7 @@ def remove_outliers_zscore(df, column, threshold=3):
     df_clean = df[(np.abs((df[column] - mean) / std) <= threshold)]
     return df_clean
 
-def scatterplot(feature, df):
+def scatterplot(feature, df, ax):
     df_copy = df.copy()
     pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x))
     sns.set_style('darkgrid')
@@ -112,33 +112,36 @@ def scatterplot(feature, df):
     df_copy[feature] = pd.to_numeric(df_copy[feature], errors='coerce')
     df_copy.dropna(subset=[feature, '總價元'], inplace=True)
 
-    plt.figure(figsize=(8, 5))
-    sns.scatterplot(x=df_copy[feature], y=df_copy['總價元'], alpha=0.5)
+    sns.scatterplot(x=df_copy[feature], y=df_copy['總價元'], alpha=0.5, ax=ax)
+    ax.set_title(f'{feature} 與 總價元 的散佈圖', fontsize=10)
+    ax.set_xlabel(feature)
+    ax.set_ylabel('總價元')
 
-    plt.title(f'{feature} 與 總價元 的散佈圖', fontsize=12)
-    plt.xlabel(feature)
-    plt.ylabel('總價元')
-
-    plt.show()
-
-    return df_copy
+# 設置子圖的網格大小
+rows = 3  # 每行顯示的散佈圖數量
+cols = 3  # 每頁顯示的行數
 
 features = [
-    '鄉鎮市區', '交易標的', '土地位置建物門牌', '土地移轉總面積平方公尺', '都市土地使用分區', '非都市土地使用分區', 
-    '非都市土地使用編定', '交易年月日', '交易筆棟數', '移轉層次', '總樓層數', '建物型態', '主要用途', 
-    '主要建材', '建築完成年月', '建物移轉總面積平方公尺', '建物現況格局-房', '建物現況格局-廳', 
-    '建物現況格局-衛', '建物現況格局-隔間', '有無管理組織', '單價元平方公尺', '車位類別', 
-    '車位移轉總面積平方公尺', '車位總價元', '備註', '建案名稱', '棟及號', '解約情形'
+    '土地移轉總面積平方公尺', '交易筆棟數', '總樓層數', '建物現況格局-房', '建物現況格局-廳', 
+    '建物現況格局-衛', '單價元平方公尺', '車位移轉總面積平方公尺', '車位總價元'
 ]
 
-# 依序繪製每個特徵的散佈圖
-for feature in features:
+fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(15, 12))
+fig.tight_layout(pad=3.0)
+
+for i, feature in enumerate(features):
+    row = i // cols
+    col = i % cols
     try:
         print(f"繪製 {feature} 與 總價元 的散佈圖")
-        scatterplot(feature, df_train)
+        scatterplot(feature, df_train, axes[row, col])
     except Exception as e:
         print(f"{feature} 特徵無法繪製散佈圖，錯誤原因：{e}")
+
+plt.show()
 ```
+![Correlations Diagram](Image/Correlations.png)
+
 
 #### 4. 刪除掉raw data中有"main use"的row(rawdata中有一行亂碼)
 `df_train = df_train[~df_train['主要用途'].str.contains("main use", na=False)]`
