@@ -1,2 +1,5 @@
-# taiwanese-house-sale-price-prediction-challenge-Weng1002
+# 智能所-Machine Learning Lab1-台灣房價迴歸預測
+## Author：國立陽明交通大學 資訊管理與財務金融學系財務金融所碩一 313707043 翁智宏
+
+本次是機器學習第一次作業，是拿台灣真實房價的資料來去訓練一個模型，然後透過
 
