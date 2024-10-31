@@ -9,7 +9,7 @@ Kaggle Competition：[點擊這裡](https://plvr.land.moi.gov.tw/Index) 競賽�
 
 最終成績如下所示：
 
-![最終成績](image/Kaggle 排名成績.png)
+![最終成績](image/Kaggle_排名成績.png)
 
 > 誤差在 10 萬上下
 ---
